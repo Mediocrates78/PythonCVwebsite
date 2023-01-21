@@ -26,7 +26,7 @@
     <br>
     <br>
     <input name="encoding_button" type="submit" value="Encode">
-    <br><br>
+    <br>
     <h3>Encoded</h3>
     <textarea class="encode_input" cols="80" rows="10" name="encoded" placeholder="Please enter encoded message here.">{{encoder.1}}</textarea>
     <br>
@@ -56,41 +56,41 @@
                 num = "0"
             return num
 
-        bin_dict = {}
-        <strong style="color: crimson;">These are the characters available for the binary dict</strong>
-        <strong style="color: crimson;">If any characters other than these are used, it may get a KEY_ERROR</strong>
-        char_list = ["!", '"', "#", "$", "%", "&", "'", "(", ")", "*", "+", ",", "-", ".", "/"] \
-        + [str(i) for i in range(10)] + [":", ";", "<", "=", ">", "?", "@"] + [i for i in string.ascii_uppercase] \
-        + ["[", "\\", "]", "^", "_", "`"] + [i for i in string.ascii_lowercase] + ["{", "|", "}", "~"]
-        <strong style="color: crimson;">Establishing the baseline for the binary code</strong>
-        bin = ["0", "0", "1", "0", "0", "0", "0", "0"]
-        <strong style="color: crimson;">Switch between ones and zeroes when the enumerate is divisible by the key number</strong>
-        <strong style="color: crimson;">I chose to count backwards through the sequence since the last numbers are the ones that change the most</strong>
-        multi = {'2': -2, '4': -3, '8': -4, '16': -5, '32': -6 }
-        for i, j in enumerate(char_list):
-            bin[-1] = bin_switch(bin[-1])
-            for key, value in multi.items():
-                if (i + 1) % int(key) == 0 and i != 0:
-                    bin[value] = bin_switch(bin[value])
-            <strong style="color: crimson;">Since the third number [-6] starts at 1 instead of 0, I had to make an allowance</strong>
-            if i + 1 == 32:
-                bin[-7] = "1"
-            bin_dict[j] = "".join(bin)
-            <strong style="color: crimson;">A space is different to the rest of the code so I add it seperately</strong>
-            bin_dict[" "] = "00000000"
-            
-        <strong style="color: crimson;">Morse code does not follow the letter sequence and is MUCH shorter</strong>
-        <strong style="color: crimson;">So I chose to simply type this one out to save time and energy</strong>
-        <strong style="color: crimson;">I have also replaced the dots with 0s and the dashes with 1s</strong>
-        morse_dict = {
-            "a": "01", "b": "1000", "c": "1010", "d": "100", "e": "0", "f": "0010", "g": "110", "h": "0000", 
-            "i": "00", "j": "1000", "k": "101", "l": "0100", "m": "11", "n": "10", "o": "111", "p": "0110", 
-            "q": "1101", "r": "010", "s": "000", "t": "1", "u": "001", "v": "0001", "w": "011", "x": "1011", 
-            "y": "1011", "z": "1100"
-        }
-        <strong style="color: crimson;">Return both dicts as a list rather than writing two seperate functions</strong>
-        dicts = [bin_dict, morse_dict]
-        return dicts
+    bin_dict = {}
+    <strong style="color: crimson;">These are the characters available for the binary dict</strong>
+    <strong style="color: crimson;">If any characters other than these are used, it may get a KEY_ERROR</strong>
+    char_list = ["!", '"', "#", "$", "%", "&", "'", "(", ")", "*", "+", ",", "-", ".", "/"] \
+    + [str(i) for i in range(10)] + [":", ";", "<", "=", ">", "?", "@"] + [i for i in string.ascii_uppercase] \
+    + ["[", "\\", "]", "^", "_", "`"] + [i for i in string.ascii_lowercase] + ["{", "|", "}", "~"]
+    <strong style="color: crimson;">Establishing the baseline for the binary code</strong>
+    bin = ["0", "0", "1", "0", "0", "0", "0", "0"]
+    <strong style="color: crimson;">Switch between ones and zeroes when the enumerate is divisible by the key number</strong>
+    <strong style="color: crimson;">I chose to count backwards through the sequence since the last numbers are the ones that change the most</strong>
+    multi = {'2': -2, '4': -3, '8': -4, '16': -5, '32': -6 }
+    for i, j in enumerate(char_list):
+        bin[-1] = bin_switch(bin[-1])
+        for key, value in multi.items():
+            if (i + 1) % int(key) == 0 and i != 0:
+                bin[value] = bin_switch(bin[value])
+        <strong style="color: crimson;">Since the third number [-6] starts at 1 instead of 0, I had to make an allowance</strong>
+        if i + 1 == 32:
+            bin[-7] = "1"
+        bin_dict[j] = "".join(bin)
+        <strong style="color: crimson;">A space is different to the rest of the code so I add it seperately</strong>
+        bin_dict[" "] = "00000000"
+        
+    <strong style="color: crimson;">Morse code does not follow the letter sequence and is MUCH shorter</strong>
+    <strong style="color: crimson;">So I chose to simply type this one out to save time and energy</strong>
+    <strong style="color: crimson;">I have also replaced the dots with 0s and the dashes with 1s</strong>
+    morse_dict = {
+        "a": "01", "b": "1000", "c": "1010", "d": "100", "e": "0", "f": "0010", "g": "110", "h": "0000", 
+        "i": "00", "j": "1000", "k": "101", "l": "0100", "m": "11", "n": "10", "o": "111", "p": "0110", 
+        "q": "1101", "r": "010", "s": "000", "t": "1", "u": "001", "v": "0001", "w": "011", "x": "1011", 
+        "y": "1011", "z": "1100"
+    }
+    <strong style="color: crimson;">Return both dicts as a list rather than writing two seperate functions</strong>
+    dicts = [bin_dict, morse_dict]
+    return dicts
 
     <strong style="color: crimson;">To encode an unencoded message</strong>
     def encoding(unenc):
