@@ -1,0 +1,72 @@
+{% extends 'main/base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="coding_body">
+    <h2>
+        Here is a completely unneccessary method to find the lowest number in a list of numbers.
+        <br>
+        Don't worry, I would never use code like this except as an excercise or a joke.
+        <br>
+        Obviously I would actually just use:
+        <br>
+        <code>sorted(my_list)[0]</code>
+         
+    </h2>
+    <br>
+    <h2>Please enter some numbers or press random to have them randomly selected.</h2>
+
+
+    <form action="lowest" method="POST">
+        {% csrf_token %}
+        <input class="lowest_number_submit" name="lowest_submit" type="submit" value="Random">
+        <br><br>
+        <input class="code_number_input" type="text" name="no1" maxlength="2" value={{random.0}}>
+        <input class="code_number_input" type="text" name="no2" maxlength="2" value={{random.1}}>
+        <input class="code_number_input" type="text" name="no3" maxlength="2" value={{random.2}}>
+        <input class="code_number_input" type="text" name="no4" maxlength="2" value={{random.3}}>
+        <input class="code_number_input" type="text" name="no5" maxlength="2" value={{random.4}}>
+        <input class="code_number_input" type="text" name="no6" maxlength="2" value={{random.5}}>
+        <input class="code_number_input" type="text" name="no7" maxlength="2" value={{random.6}}>
+        <br>
+        <br>
+        <input class="lowest_number_submit" name="lowest_submit" type="submit" value="Submit">
+    </form>
+
+    <div class="code_display_wrapper">
+        <div class="lowest_output_label"><h3>Output</h3></div>
+        <div class="python" name="lowest_output">
+            <pre><code>
+{% for i in result %}
+    {{ i }}
+{% endfor %}
+            </code></pre>
+        </div>
+        <div class="lowest_code_label"><h3>Code</h3></div>
+        <div class="python" name="display_code">
+            <pre><code>
+    def find_lowest(my_list):
+        <strong style="color: crimson;"># checks if first number is lower than second number</strong>
+        if my_list[0] < my_list[1]:
+            <strong style="color: crimson;"># If so, it moves the first number to the end of the list</strong>
+            my_list.append(my_list[0])
+            del(my_list[0])
+        else:
+            <strong style="color: crimson;"># Otherwise, it just deletes the first number</strong>
+            del(my_list[0])
+            <strong style="color: crimson;"># If there's more than one number in the list</strong>
+        if len(my_list) > 1:
+            <strong style="color: crimson;"># It runs recursively until there's only one number left</strong>
+            return find_lowest(my_list)
+        else:
+            <strong style="color: crimson;"># Then it returns the remaining number</strong>
+            return my_list[0]
+            </code></pre>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends 'main/base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="home_table_wrapper">
+    <div class="home_table_image">
+        <img src="{% static '/images/Dave.png' %}" alt="Image of Dave" height="600">
+    </div>
+    <div class="home_table_name">
+        <h1>Dave Ronnert</h1>
+    </div>
+    <div class="home_table_info">
+        <div class="home_table_nationl"><h3>Nationality:</h3></div>
+        <div class="home_table_nationr"><h3>Australian / English</h3></div>
+        <div class="home_table_agel"><h3>Age:</h3></div>
+        <div class="home_table_ager"><h3>{{ age }}</h3></div>
+        <div class="home_table_langl"><h3>Spoken Languages:</h3></div>
+        <div class="home_table_langr"><h3>English (native) German (intermediate)</h3></div>
+    </div>
+    <div class="home_table_color"></div>
+</div>
+
+{% endblock %}

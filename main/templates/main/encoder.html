@@ -1,0 +1,162 @@
+{% extends 'main/base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="coding_body">
+    <h3>
+        I came up with a script to encode and decode messages to send to friends for a bit of fun.<br>
+        The encoded messages would be extremely hard to crack and it can even encode the same message differently.<br>
+        For example, "Hello world!" can be encoded as:<br>
+        <code>aInSgrKnzpZPMmssVqmetNmgoUeETXEimuSAiiT</code><br>
+        or<br>
+        <code>LbPrKtwSMWvxzehuQmanttgoUuXiaNETsEtsa</code><br>
+        or possibly millions of other ways.<br>
+        I understand that the encoded messages are possibly exessively longer than the original<br>
+        but the idea is to make it more difficult to break and having differing lengths adds to the difficulty.<br>
+        This is intended for short messages up to a couple of sentences, not for large documents.
+    </h3>
+</div>
+
+<form action="encoder" method="POST">
+    {% csrf_token %}
+    <h3>Unencoded</h3>
+    <textarea class="encode_input" cols="80" rows="10" name="uncoded" placeholder="Please enter message to encode here.">{{encoder.0}}</textarea>
+    <br>
+    <br>
+    <input name="encoding_button" type="submit" value="Encode">
+    <br><br>
+    <h3>Encoded</h3>
+    <textarea class="encode_input" cols="80" rows="10" name="encoded" placeholder="Please enter encoded message here.">{{encoder.1}}</textarea>
+    <br>
+    <br>
+    <input name="encoding_button" type="submit" value="Decode">
+</form>
+<br>
+<div class="coding_body">
+    <h3>
+        Here is the code and an explanation for how it's done.<br>
+        I personally think it's suprisingly easy.
+    </h3>
+</div>
+<div class="code_display_wrapper">
+    <div class="python" name="display_code">
+        <pre><code>
+    import random as rnd
+    import string
+
+    <strong style="color: crimson;">I start by generating 2 dictionaries, one for binary and one for morse code</strong>
+    def make_dicts():
+        <strong style="color: crimson;">This nested function simply switches the ones and zeroes for the binary dict</strong>
+        def bin_switch(num):
+            if num == "0":
+                num = "1"
+            else:
+                num = "0"
+            return num
+
+        bin_dict = {}
+        <strong style="color: crimson;">These are the characters available for the binary dict</strong>
+        <strong style="color: crimson;">If any characters other than these are used, it may get a KEY_ERROR</strong>
+        char_list = ["!", '"', "#", "$", "%", "&", "'", "(", ")", "*", "+", ",", "-", ".", "/"] \
+        + [str(i) for i in range(10)] + [":", ";", "<", "=", ">", "?", "@"] + [i for i in string.ascii_uppercase] \
+        + ["[", "\\", "]", "^", "_", "`"] + [i for i in string.ascii_lowercase] + ["{", "|", "}", "~"]
+        <strong style="color: crimson;">Establishing the baseline for the binary code</strong>
+        bin = ["0", "0", "1", "0", "0", "0", "0", "0"]
+        <strong style="color: crimson;">Switch between ones and zeroes when the enumerate is divisible by the key number</strong>
+        <strong style="color: crimson;">I chose to count backwards through the sequence since the last numbers are the ones that change the most</strong>
+        multi = {'2': -2, '4': -3, '8': -4, '16': -5, '32': -6 }
+        for i, j in enumerate(char_list):
+            bin[-1] = bin_switch(bin[-1])
+            for key, value in multi.items():
+                if (i + 1) % int(key) == 0 and i != 0:
+                    bin[value] = bin_switch(bin[value])
+            <strong style="color: crimson;">Since the third number [-6] starts at 1 instead of 0, I had to make an allowance</strong>
+            if i + 1 == 32:
+                bin[-7] = "1"
+            bin_dict[j] = "".join(bin)
+            <strong style="color: crimson;">A space is different to the rest of the code so I add it seperately</strong>
+            bin_dict[" "] = "00000000"
+            
+        <strong style="color: crimson;">Morse code does not follow the letter sequence and is MUCH shorter</strong>
+        <strong style="color: crimson;">So I chose to simply type this one out to save time and energy</strong>
+        <strong style="color: crimson;">I have also replaced the dots with 0s and the dashes with 1s</strong>
+        morse_dict = {
+            "a": "01", "b": "1000", "c": "1010", "d": "100", "e": "0", "f": "0010", "g": "110", "h": "0000", 
+            "i": "00", "j": "1000", "k": "101", "l": "0100", "m": "11", "n": "10", "o": "111", "p": "0110", 
+            "q": "1101", "r": "010", "s": "000", "t": "1", "u": "001", "v": "0001", "w": "011", "x": "1011", 
+            "y": "1011", "z": "1100"
+        }
+        <strong style="color: crimson;">Return both dicts as a list rather than writing two seperate functions</strong>
+        dicts = [bin_dict, morse_dict]
+        return dicts
+
+    <strong style="color: crimson;">To encode an unencoded message</strong>
+    def encoding(unenc):
+        <strong style="color: crimson;">Establish and seperate the two dictionaries</strong>
+        bin_dict, morse_dict = make_dicts()[0], make_dicts()[1]
+        temp = ""
+        encoded = ""
+        <strong style="color: crimson;">Iterate through the characters in the message to be encoded</strong>
+        for letter in unenc:
+            <strong style="color: crimson;">This 'Try and Except' prevents the KEY_ERROR mentioned earlier</strong>
+            try:
+                <strong style="color: crimson;">I make a big string of ones and zeroes made from the binary translation of the message</strong>
+                temp += bin_dict[letter]
+            <strong style="color: crimson;">If there is a KEY_ERROR, simply display an error message</strong>
+            except KeyError:
+                encoded = f"ERROR: unknown character: {letter}"
+                return encoded
+
+        while len(temp) >= 1:
+            <strong style="color: crimson;">Randomly break the binary string into random pieces between 1 and 4 digits</strong>
+            randno1 = rnd.randint(1, 4)
+            <strong style="color: crimson;">Run each piece through the morse dictionary to find the corresponding letter</strong>
+            <strong style="color: crimson;">This makes the same message encode in a different way each time</strong>
+            <strong style="color: crimson;">It also makes the encoded message much longer than the original</strong>
+            for key, value in morse_dict.items():
+                if temp[0:randno1] == value:
+                    <strong style="color: crimson;">Each letter has a 1 in 3 chance of being cpitalized</strong>
+                    <strong style="color: crimson;">This is a RED HERRING for anyone trying to break the code</strong>
+                    randno2 = rnd.randint(1, 3)
+                    if randno2 == 1:
+                        encoded += key.upper()
+                    else:
+                        encoded += key
+                    temp = temp[randno1:]
+                <strong style="color: crimson;">Sometimes it will come up with a sequence that isn't in the morse dict</strong>
+                <strong style="color: crimson;">If that happens, simply repeat the sequence until it does</strong>
+                else:
+                    pass
+        <strong style="color: crimson;">Return encoded message</strong>
+        return encoded
+
+    <strong style="color: crimson;">To decode the message simply reverse the sequence</strong>
+    def decoding(enc):
+        <strong style="color: crimson;">Establish and seperate the dictionaries</strong>
+        bin_dict, morse_dict = make_dicts()[0], make_dicts()[1]
+        temp = ""
+        decoded = ""
+        <strong style="color: crimson;">Strip out the pointless capitalization</strong>
+        enc = enc.lower()
+        <strong style="color: crimson;">Run each letter through the morse dictionary and rebuild the binary translation</strong>
+        <strong style="color: crimson;">There's no need for an if or try statements. I already know it's there if it's already encoded</strong>
+        for letter in enc:
+            temp += morse_dict[letter]
+        <strong style="color: crimson;">Break up the binary translation into chunks of 8 and run that through the binary dictionary</strong>
+        for i in range(len(temp[::8])):
+            for key, value in bin_dict.items():
+                if temp[0:8] == value:
+                    <strong style="color: crimson;">And finally rebuild the original message</strong>
+                    decoded += key
+            temp = temp[8:]
+        <strong style="color: crimson;">Return original message</strong>
+        return decoded
+        </code></pre>
+    </div>
+</div>
+
+
+
+{% endblock %}
