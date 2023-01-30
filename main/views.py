@@ -11,7 +11,7 @@ def home(request):
         age -= 1
     elif current.month == bday.month and current.day < bday.day:
         age -= 1
-    return render(request, 'main/home.html', {'age': age})
+    return render(request, 'main/index.html', {'age': age})
 
 def fun(request):
     return render(request, 'main/fun.html', {})
