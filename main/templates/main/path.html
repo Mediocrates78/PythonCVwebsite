@@ -1,0 +1,251 @@
+{% extends 'main/base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<h2>I wrote a simple little pathfinder program which counts the number of steps between any two points on a grid.</h2>
+<h4>Simply click on a starting point and then click on an ending point. The starting point will turn red and the ending point will turn blue.</h4>
+<h4>The code will then count the number of steps between the two points.</h4>
+<h4>I originally wrote this in Python using Tkinter as a front end, but Tkinter doesn't work with HTML.</h4>
+<h4>I then spent the weekend learning some JavaScript and it only took a few hours to translate the Python to JavaScript.</h4>
+<h4>Both codes can be found below. I'll simplify the code a bit and cut out the unnecissary fluff</h4>
+<h4>such as building the grid, writing instructions and the like. That way you can see the comparison between the two codes.</h4>
+
+<div class="grid_wrapper">
+    <div id="grid"></div>
+</div>
+
+
+<div class="coding_body">
+        <div class="code_display_wrapper">
+        <div class="lowest_output_label"><h3>In Python</h3></div>
+        <div class="python" name="path_in_python">
+            <pre><code>
+    <strong style="color: crimson;">*CUT* Here, I imported Tkinter and set up the main window and frames. </strong>
+    <strong style="color: crimson;">I probably refer to them later, just know that they exist. </strong>
+    <strong style="color: crimson;">I'll also rearange the code into a more readable format, </strong>
+    <strong style="color: crimson;">That's why the functions are BELOW the code that calls them.</strong>
+
+    
+    <strong style="color: crimson;">A basic grid setup with nested for loops to create the grid of buttons.</strong>
+    <strong style="color: crimson;">I used buttons simply to make it easier to code when they're clicked on.</strong>
+    <strong style="color: crimson;">I actually considered doing this in list comprehension</strong>
+    <strong style="color: crimson;">but it would have been too unnessesary. Nested for loops were simply easier.</strong>
+    plots = []
+    
+    for i in range(20):
+    plots.append([])
+    for j in range(20):
+        <strong style="color: crimson;">When clicked, the buttons call the 'clicked' function.</strong>
+        button = Button(grid_frame, width=2, bg="white", 
+            command=lambda row=i, col=j: clicked(row, col))
+        <strong style="color: crimson;">And just some Tkinter to grid the buttons onto the frame.</strong>
+        plots[i].append(button)
+        plots[i][j].grid(row=i, column=j)
+    
+    
+    <strong style="color: crimson;">When clicked on, the button cycles through white, red or blue.</strong>
+    <strong style="color: crimson;">This caused the issue of the user being able to leave multiple red and/or blue plots on the grid.</strong>
+    <strong style="color: crimson;">I fixed this issue in the JavaScript version.</strong>
+    <strong style="color: crimson;">I still found that the code worked, it just selected the lowest colored squares.</strong>
+    def clicked(row, col):
+        if plots[row][col].cget("bg") == "white":
+            plots[row][col].config(bg="red")
+        elif plots[row][col].cget("bg") == "red":
+            plots[row][col].config(bg="blue")
+        else:
+            plots[row][col].config(bg="white")
+    
+    
+    <strong style="color: crimson;">I also added a start button rather than having the code run automatically.</strong>
+    <strong style="color: crimson;">Something else I fixed in the JavaScript version.</strong>
+    start_button = Button(select_frame, text="Begin", command=lambda:pathfind(plots))
+    start_button.grid(row=3, column=0)
+    
+    
+    <strong style="color: crimson;">The pathfind function acts as the hub of the code,</strong>
+    <strong style="color: crimson;">calling on the other functions and gathering the necessary variables.</strong>
+    def pathfind(plots):
+        <strong style="color: crimson;">The get_coords function finds the red and blue squares and returns usable coordinates.</strong>
+        coords = get_coords()
+        <strong style="color: crimson;">The get_steps function converts the coordinates</strong>
+        <strong style="color: crimson;">into a list of plots between the start and end points.</strong>
+        steps = get_steps(coords)
+        <strong style="color: crimson;">and then it just adds the numbers to the correct buttons.</strong>
+        for num, step in enumerate(steps):
+            plots[step[0]][step[1]].config(text=str(num + 1))
+
+    
+    def get_coords():
+        <strong style="color: crimson;">srow = start row, I think you can work out the rest.</strong>
+        srow, scol, erow, ecol = 0, 0, 0, 0
+        <strong style="color: crimson;">I decided to use enumeration to find the red and blue plots.</strong>
+        <strong style="color: crimson;">That's why the code only worked with the lowest selected red and blue plots.</strong>
+        for a, b in enumerate(plots):
+            for c, d in enumerate(b):
+                if d.cget("bg") == "red":
+                    srow = a
+                    scol = c
+                if d.cget("bg") == "blue":
+                    erow = a
+                    ecol = c
+        coords = [srow, scol, erow, ecol]
+        return coords
+
+    
+    def get_steps(coords):
+        <strong style="color: crimson;">Now that the code has the red and blue plots, it takes the start and end points,</strong>
+        <strong style="color: crimson;">sorts them so they can be used in an 'in range' for loop,</strong>
+        rows = sorted([coords[0], coords[2]])
+        cols = sorted([coords[1], coords[3]])
+        <strong style="color: crimson;">and makes a list of the plots between them.</strong>
+        <strong style="color: crimson;">Unfortunately, the two lists are very rarely equal.</strong>
+        row_steps = [i for i in range(rows[0], rows[1])]
+        col_steps = [i for i in range(cols[0], cols[1])]
+        <strong style="color: crimson;">My solution was to find the shorter of the two lists,</strong>
+        if len(row_steps) > len(col_steps):
+            <strong style="color: crimson;">have it repeat itself until it wasn't shorter</strong>
+            while len(col_steps) < len(row_steps):
+                col_steps = col_steps + col_steps
+            <strong style="color: crimson;">and then sort the list, cutting it off when it was equal with the other list.</strong>
+            <strong style="color: crimson;">That gave me two equal lists and smoothed the shorter one,</strong>
+            <strong style="color: crimson;">making the path more direct.</strong>
+            col_steps = sorted([i for i in col_steps[:len(row_steps)]])
+        elif len(col_steps) > len(row_steps):
+            while len(row_steps) < len(col_steps):
+                row_steps = row_steps + row_steps
+            row_steps = sorted([i for i in row_steps[:len(col_steps)]])
+        else:
+            pass
+        <strong style="color: crimson;">In case the blue plot was above or to the left of the red plot,</strong>
+        <strong style="color: crimson;">I checked the pre-sorted coordinates and reversed the lists appropriately.</strong>
+        if coords[0] > coords[2]:
+            row_steps.reverse()
+        if coords[1] > coords[3]:
+            col_steps.reverse()
+        <strong style="color: crimson;">One quick zip later and I have a list of steps leading directly</strong>
+        <strong style="color: crimson;">from the red plot to the blue plot.</strong>
+        steps = list(zip(row_steps, col_steps))
+        return steps
+            </code></pre>
+        </div>
+        <div class="lowest_code_label"><h3>In JavaScript</h3></div>
+        <div class="python" name="path_in_java">
+            <pre><code>
+    <strong style="color: crimson;">This is the code which is currently operating on this page.</strong>
+    <strong style="color: crimson;">I decided to leave the grid build in because it has stuff referred to later.</strong>
+    <strong style="color: crimson;">As the functions in JavaScript don't need to be above the code calling them,</strong>
+    <strong style="color: crimson;">I decided to leave this code as it was written.</strong>
+
+
+    <strong style="color: crimson;">Select and set up the div with id="grid"</strong>
+    let gridDisplay = document.querySelector('#grid')
+    gridDisplay.style.display = 'grid'
+    <strong style="color: crimson;">I made the grid div big enough to store the 30px x 30px buttons which was set in the CSS file.</strong>
+    <strong style="color: crimson;">Since I'd only spent 1 1/2 days learning JavaScript, I didn't know</strong>
+    <strong style="color: crimson;">if you can add CSS to the CSS file through code</strong>
+    <strong style="color: crimson;">which is why I added styling directly to the HTML elements.</strong>
+    gridDisplay.style.width = '600px'
+    gridDisplay.style.height = '600px'
+
+    buildGrid()
+    let startEnd = 0
+    let coords = []
+
+
+    <strong style="color: crimson;">As with the Python code, I used nested for loops to create the buttons,</strong>
+    <strong style="color: crimson;">but instead of storing them in an array,</strong>
+    function buildGrid() {
+        for (let x = 0; x < 20; x ++) {
+            for (let y = 0; y < 20; y++) {
+                const plot = document.createElement('button')
+                <strong style="color: crimson;">I turned the coordinates into a 4-digit string,</strong>
+                let xStr = ('0' + x.toString()).slice(-2)
+                let yStr = ('0' + y.toString()).slice(-2)
+                let plotId = xStr + yStr
+                plot.setAttribute('class', 'path_button')
+                <strong style="color: crimson;">added the coordinates string to the id</strong>
+                plot.setAttribute('id', plotId)
+                plot.style.backgroundColor = 'white'
+                plot.style.color = "black"
+                <strong style="color: crimson;">added an addEventListener to the clicked function,</strong>
+                plot.addEventListener('click', clicked)
+                <strong style="color: crimson;">gridded them up</strong>
+                plot.style.gridColumn = x + 1
+                plot.style.gridRow = y + 1
+                <strong style="color: crimson;">and then added them directly to the grid div.</strong>
+                gridDisplay.append(plot)
+            }
+        }
+    }
+
+    function clicked() {
+        let plotColor = this.style.backgroundColor
+        let plotIdNumber = this.id
+        const clickedPlot = this
+
+        <strong style="color: crimson;">Instead of cycling through the red, blue and white like in the Python code,</strong>
+        <strong style="color: crimson;">instead I fixed the problem by adding a click counter.</strong>
+        if (startEnd == 0) {
+            <strong style="color: crimson;">on the first click, the clicked button turns red</strong>
+            clickedPlot.style.backgroundColor = "red"
+            <strong style="color: crimson;">and adds the 4-digit string coordinates directly to a waiting array.</strong>
+            coords.push(clickedPlot.id)
+            startEnd ++
+        } else {
+            <strong style="color: crimson;">On the second click, the clicked button turns blue and runs the code.</strong>
+            <strong style="color: crimson;">That solved the problem of leaving multiple red or blue squares</strong>
+            <strong style="color: crimson;">and eliminated the need for the start button, making the page a little bit cleaner.</strong>
+            clickedPlot.style.backgroundColor = "blue"
+            coords.push(clickedPlot.id)
+            const steps = getSteps()
+            markSteps(steps)
+        }
+    }
+
+
+    <strong style="color: crimson;">This function works exactly the same as the get_steps function in the Python code.</strong>
+    <strong style="color: crimson;"><=== Right there. :)</strong>
+    function getSteps() {
+        let colSteps = [], rowSteps = [], steps = []
+        let cols = [parseInt(coords[0].slice(0, 2)), parseInt(coords[1].slice(0, 2))].sort((a, b)=>a-b)
+        let rows = [parseInt(coords[0].slice(2)), parseInt(coords[1].slice(2))].sort((a, b)=>a-b)
+        for (let i = cols[0]; i < cols[1] + 1; i++) {colSteps.push(i)}
+        for (let i = rows[0]; i < rows[1] + 1; i++) {rowSteps.push(i)}
+        if (colSteps.length > rowSteps.length) {
+            while (colSteps.length > rowSteps.length) {rowSteps = rowSteps.concat(rowSteps)}
+            rowSteps = rowSteps.slice(0, colSteps.length).sort((a, b)=>a-b)
+        } else if (rowSteps.length > colSteps.length){
+            while (rowSteps.length > colSteps.length) {colSteps = colSteps.concat(colSteps)}
+            colSteps = colSteps.slice(0, rowSteps.length).sort((a, b)=>a-b)
+        } else {}
+        if (parseInt(coords[0].slice(0, 2)) > parseInt(coords[1].slice(0, 2))){
+            colSteps = colSteps.sort((a, b)=>b-a)
+        }
+        if (parseInt(coords[0].slice(2)) > parseInt(coords[1].slice(2))){
+            rowSteps = rowSteps.sort((a, b)=>b-a)
+        }
+        return steps = colSteps.map(function(x, y) {return [x, rowSteps[y]]})
+    }
+
+
+    <strong style="color: crimson;">And finally, it takes the coordinates array,</strong>
+    function markSteps(steps) {
+        for (let x in steps) {
+            <strong style="color: crimson;">converts them back into the 4-digit strings mentioned at the top of the code,</strong>
+            let coord = ("0" + steps[x][0].toString()).slice(-2) + ("0" + steps[x][1].toString()).slice(-2)
+            <strong style="color: crimson;">finds the correct button</strong>
+            const mark = document.getElementById(coord)
+            <strong style="color: crimson;">and appends the step number.</strong>
+            mark.append(x)
+        }
+    }
+            </code></pre>
+        </div>
+    </div>
+</div>
+
+<script src="{%  static 'js/pathfinder.js' %}"></script>
+
+{% endblock %}

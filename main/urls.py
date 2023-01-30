@@ -6,4 +6,5 @@ urlpatterns = [
     path('fun', views.fun, name='FUN'),
     path('lowest', views.lowest, name='LOWEST'),
     path('encoder', views.encoder, name='ENCODER'),
+    path('path', views.path, name='PATH'),
 ]

@@ -46,3 +46,8 @@ def encoder(request):
         unencoded = decoding(encoded)
     context = {'encoder': [unencoded, encoded]}
     return render(request, 'main/encoder.html', context)
+
+def path(request):
+    butts = [i for i in range(20)]
+    context = {'butts': butts}
+    return render(request, 'main/path.html', context)
