@@ -51,3 +51,22 @@ def path(request):
     butts = [i for i in range(20)]
     context = {'butts': butts}
     return render(request, 'main/path.html', context)
+
+def sudoku(request):
+    grid = make_sudoku()
+
+    grid2 = []
+    for x in grid:
+        temp = []
+        for y in x:
+            temp.append(y)
+        grid2.append(temp)
+    
+    solved = solve(grid2)
+
+    context = {
+        'grid': grid,
+        'solved': solved
+        }
+    print(request.POST)
+    return render(request, 'main/sudoku.html', context)

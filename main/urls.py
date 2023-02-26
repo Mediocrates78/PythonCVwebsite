@@ -7,4 +7,5 @@ urlpatterns = [
     path('lowest', views.lowest, name='LOWEST'),
     path('encoder', views.encoder, name='ENCODER'),
     path('path', views.path, name='PATH'),
+    path('sudoku', views.sudoku, name="SUDOKU"),
 ]

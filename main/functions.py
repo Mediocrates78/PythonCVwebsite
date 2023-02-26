@@ -1,5 +1,6 @@
 import string
 import random as rnd
+import json
 
 def find_lowest(num_list):
     try:
@@ -92,4 +93,135 @@ def decoding(enc):
                 decoded += key
         temp = temp[8:]
     return decoded
+
+def make_sudoku():
+    def find_avails(grid):
+        avails = []
+        temp = []
+        for i in range(9):
+            temp.append([i, "*", [j for j in range(9) if grid[i][j] == 0]])
+        for k in range(3):
+            temp2 = []
+            for m in range(3):
+                temp2.append(temp[k + (m * 3)])
+            rnd.shuffle(temp2)
+            avails.append(temp2)
+        return avails
+
+    def round_one(control, avails):
+        for i in range(3):
+            for j in range(3):
+                avails[i][j][1] = control[i][j]
+        return avails
+
+    def control_check(control, avails):
+        temp = [[], [], []]
+        one = avails[0][0][2] + avails[0][1][2] + avails[0][2][2]
+        two = avails[1][0][2] + avails[1][1][2] + avails[1][2][2]
+        three = avails[2][0][2] + avails[2][1][2] + avails[2][2][2]
+        for i in control:
+            if i[0] in one:
+                temp[0].append(i)
+            if i[0] in two:
+                temp[1].append(i)
+            if i[0] in three:
+                temp[2].append(i)
+        for i in range(3):
+            if temp[i][0] in temp[i - 1] and len(temp[i - 1]) > 1:
+                temp[i - 1].remove(temp[i][0])
+            if temp[i][0] in temp[i - 2] and len(temp[i - 2]) > 1:
+                temp[i - 2].remove(temp[i][0])
+
+        return [temp[0][0], temp[1][0], temp[2][0]]
+
+    def get_plots(control, avails, num):
+        control = control_check(control, avails)
+        for i in range(3):
+            for j in range(3):
+                while avails[i][j][1] == "*":
+                    if control[0][0] in avails[i][j][2]:
+                        avails[i][j][1] = control[0][0]
+                        del control[0][0]
+                        if len(control[0]) == 0:
+                            del control[0]
+                    elif control[0][0] not in avails[i][j][2] and len(control[0]) != 1:
+                        control[0].append(control[0].pop(0))
+                    else:
+                        if control[0][0] in avails[i][j - 1][2]:
+                            control[0].append(avails[i][j - 1][1])
+                            avails[i][j - 1][1] = control[0][0]
+                            del control[0][0]
+                        elif control[0][0] in avails[i][j - 2][2]:
+                            control[0].append(avails[i][j - 2][1])
+                            avails[i][j - 2][1] = control[0][0]
+                            del control[0][0]
+        return avails
+
+    def unsolved(grid):
+        new_grid = [[0 for i in range(9)] for j in range(9)]
+        plots = []
+        while len(plots) < 25:
+            for i in range(25):
+                x = rnd.randint(0, 8)
+                y = rnd.randint(0, 8)
+                if [x, y] in plots:
+                    pass
+                else:
+                    plots.append([x, y])
+        for i in plots:
+            new_grid[i[0]][i[1]] = grid[i[0]][i[1]] 
+
+        return new_grid
+
+    grid = [[0 for i in range(9)] for j in range(9)]
+    for num in range(1, 10):
+        control = [[0, 1, 2], [3, 4, 5], [6, 7, 8]]
+        rnd.shuffle(control)
+        avails = find_avails(grid)
+
+        if num == 1:
+            avails = round_one(control, avails)
+        else:
+            avails = get_plots(control, avails, num)
+
+        for i in avails:
+            for j in i:
+                grid[j[0]][j[1]] = num
+    unsolv = unsolved(grid)
+
+    return unsolv
+
+def solve(grid):
+    def find_empty(grid):
+        for x in range(9):
+            for y in range(9):
+                if grid[x][y] != 0:
+                    pass
+                else:
+                    return [x, y]
+
+    def valid(grid, plot, num):
+        row = grid[plot[0]]
+        col = [i[plot[1]] for i in grid]
+        three = []
+        for x in range((plot[0] // 3) * 3, ((plot[0] // 3) * 3) + 3):
+            for y in range((plot[1] // 3) * 3, ((plot[1] // 3) * 3) + 3):
+                three.append(grid[x][y])
+        if num not in row and num not in col and num not in three:
+            return True
+
+    plot = find_empty(grid)
+    if not plot:
+        return True
+    else:
+        row, col = plot[0], plot[1]
+        for num in range(1, 10):
+            if valid(grid, [row, col], num):
+                grid[row][col] = num
+                if solve(grid):
+                    return grid
+            grid[row][col] = 0
+        return False
+
+        
 

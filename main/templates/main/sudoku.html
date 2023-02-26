@@ -1,0 +1,240 @@
+{% extends 'main/base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<h2>This one is a little bit different because technically, it's not my code</h2>
+<h2>but bare with me, I'll explain. </h2>
+<h4>I say 'technically' not my code, because it originally comes fom a Youtube tutorial but I now understand it enough</h4>
+<h4>that I can rewrite it, not as simply learned formulas but why each line is there and what they all do.</h4>
+<h4>So I saw a lot of people recommending to build a Sudoku solver and not one to back down from a bit of a coding challenge,</h4>
+<h4>I tried to write the solver to operate in the same way that I solve Sudokus. Unfortunately, I'm not very good at Sudokus</h4>
+<h4>so neither was the code. In the end, I went through a Youtube tutorial by Kylie Ying from about 2 years ago</h4>
+<h4>on a recursive backtracking Sudoku solver and the way the code worked baffled me.</h4>
+<h4>I simply couldn't understand how the code knew how to backtrack and retain the previous coordinates</h4>
+<h4>or why it didn't just repeat the same number over and over again. After about 3 hours of studying the code, the answer came to me.</h4>
+<h3>Full explanation below.</h3>
+
+<div id="grid">
+    <div class="sud_wrapper"></div>
+</div>
+<br>
+
+<form action="/sudoku" method="GET">
+    <input class="lowest_number_submit" type="submit" id="new" value="NEW">
+    <input class="lowest_number_submit" type="button" id="solve" value="SOLVE">
+</form>
+
+<div class="coding_body">
+    <div class="code_display_wrapper">
+    <div class="lowest_output_label"><h3>Sudoku Solver</h3></div>
+    <div class="python" name="path_in_python">
+        <pre><code>
+    <strong style="color: crimson;">I would like to again preface this by saying that I did not come up with this code,</strong>
+    <strong style="color: crimson;">I simply used it as a learning experience.</strong>
+
+    def solve(grid):
+        <strong style="color: crimson;">This function simply scrolls through the Sudoku list</strong>
+        <strong style="color: crimson;">and finds the first empty space marked by a 0 and returns the x, y coordinates.</strong>
+        def find_empty(grid):
+            for x in range(9):
+                for y in range(9):
+                    if grid[x][y] != 0:
+                        pass
+                    else:
+                        return [x, y]
+        
+        <strong style="color: crimson;">This function checks to see if a guess is valid in that position.</strong>
+        def valid(grid, plot, num):
+            <strong style="color: crimson;">It defines a row,</strong>
+            row = grid[plot[0]]
+            <strong style="color: crimson;">it defines a column,</strong>
+            col = [i[plot[1]] for i in grid]
+            <strong style="color: crimson;">and it finds the 3x3 square which contains the plot.</strong>
+            three = []
+            for x in range((plot[0] // 3) * 3, ((plot[0] // 3) * 3) + 3):
+                for y in range((plot[1] // 3) * 3, ((plot[1] // 3) * 3) + 3):
+                    three.append(grid[x][y])
+            <strong style="color: crimson;">If the number doesn't appear in any of them, it places the guess.</strong>
+            if num not in row and num not in col and num not in three:
+                return True
+
+        plot = find_empty(grid)
+        <strong style="color: crimson;">This looks for the next enpty square. if there are none, it returns True.</strong>
+        if not plot:
+            return True
+        else:
+            <strong style="color: crimson;">Otherwise, it goes through the numbers 1 - 9</strong>
+            <strong style="color: crimson;">and checks if the number can be placed in the coordinates found.</strong>
+            row, col = plot[0], plot[1]
+            for num in range(1, 10):
+                if valid(grid, [row, col], num):
+                    <strong style="color: crimson;">If it can, it places the number and then recursively runs the function.</strong>
+                    grid[row][col] = num
+                    if solve(grid):
+                        <strong style="color: crimson;">And if it gets a True return (from not finding any plots),</strong>
+                        <strong style="color: crimson;">it returns the completed grid.</strong>
+                        return grid
+                <strong style="color: crimson;">Otherwise, it just keeps the space blank.</strong>
+                grid[row][col] = 0
+            return False
+            <strong style="color: crimson;">So here's the tricky bit. As long as it repeats the recursive function calls,</strong>
+            <strong style="color: crimson;">It moves up in the stack, leaving the previous stack level in a sort of stasis.</strong>
+            <strong style="color: crimson;">If the number can't be placed in a plot,</strong>
+            <strong style="color: crimson;">it recieved a False return on the 'if solve(grid)'.</strong>
+            <strong style="color: crimson;">If that happens, then it moves back down to the previous stack level</strong>
+            <strong style="color: crimson;">and picks up exactly where it left off.</strong>
+            <strong style="color: crimson;">So for example if the 'for num in range(1, 10):' was up to 4 when it moved up,</strong>
+            <strong style="color: crimson;">when it returns, it picks back up at 5, not repeating any numbers.</strong>
+            <strong style="color: crimson;">and as long as it moves up and down the stack like that,</strong>
+            <strong style="color: crimson;">it's free to try pretty much every possible combination, forcing the puzzle.</strong>
+        
+        </code></pre>
+    </div>
+    <div class="lowest_code_label"><h3>Sudoku Creator</h3></div>
+    <div class="python" name="path_in_java">
+        <pre><code>
+    <strong style="color: crimson;">This code, however is mine.</strong>
+    <strong style="color: crimson;">I think I tried 5 or 6 different approaches to making a Sudoku</strong>
+    <strong style="color: crimson;">before I came up with this one.</strong>
+    <strong style="color: crimson;">I've numbered the steps to make it easier to read and not re-arange the code.</strong>
+    <strong style="color: crimson;">Number 1 is near the bottom.</strong>
+    def make_sudoku():
+        def find_avails(grid):
+            avails = []
+            temp = []
+            for i in range(9):
+    <strong style="color: crimson;">6. The list for the available spaces for each row are set up:</strong>
+        <strong style="color: crimson;">[row number, selected plot in the row (1 - 9), list of available plots]</strong>
+        <strong style="color: crimson;">If no plot has been selected, it's marked by a *.</strong>
+        <strong style="color: crimson;">Number 7 is back down below number 5.</strong>
+                temp.append([i, "*", [j for j in range(9) if grid[i][j] == 0]])
+            for k in range(3):
+                temp2 = []
+                for m in range(3):
+                    temp2.append(temp[k + (m * 3)])
+                rnd.shuffle(temp2)
+                avails.append(temp2)
+            return avails
+
+        def round_one(control, avails):
+            for i in range(3):
+                for j in range(3):
+                    avails[i][j][1] = control[i][j]
+            return avails
+
+        def control_check(control, avails):
+        <strong style="color: crimson;">Honestly, I can barely remember how this bit works again.</strong>
+        <strong style="color: crimson;">I was quite tired when I wrote it.</strong>
+            temp = [[], [], []]
+            one = avails[0][0][2] + avails[0][1][2] + avails[0][2][2]
+            two = avails[1][0][2] + avails[1][1][2] + avails[1][2][2]
+            three = avails[2][0][2] + avails[2][1][2] + avails[2][2][2]
+            for i in control:
+                if i[0] in one:
+                    temp[0].append(i)
+                if i[0] in two:
+                    temp[1].append(i)
+                if i[0] in three:
+                    temp[2].append(i)
+            for i in range(3):
+                if temp[i][0] in temp[i - 1] and len(temp[i - 1]) > 1:
+                    temp[i - 1].remove(temp[i][0])
+                if temp[i][0] in temp[i - 2] and len(temp[i - 2]) > 1:
+                    temp[i - 2].remove(temp[i][0])
+
+            return [temp[0][0], temp[1][0], temp[2][0]]
+
+        def get_plots(control, avails, num):
+    <strong style="color: crimson;">5. Control Check is a safety precaution. As the board fills more and more,</strong>
+        <strong style="color: crimson;">the chances get higher that a randomly selected third won't have any free spaces.</strong>
+        <strong style="color: crimson;">So it goes through the available spaces list and makes sure there is at least</strong>
+        <strong style="color: crimson;">one free space in the randomly selected third.</strong>
+        <strong style="color: crimson;">If there isn't it rearanges them so that there are.</strong>
+        <strong style="color: crimson;">Number 6 is up in 'find_avails()' at the top.</strong>
+            control = control_check(control, avails)
+            for i in range(3):
+                for j in range(3):
+    <strong style="color: crimson;">7. It then goes through row by row, for each set of 3 rows</strong>
+        <strong style="color: crimson;">placing the current number (1, 2, 3, etc) in a random third.</strong>
+        <strong style="color: crimson;">Once it's done the first third, it reloads and reshuffles the control.</strong>
+        <strong style="color: crimson;">As it goes, it removes that spot from control, ensuring that no subsequent numbers</strong>
+        <strong style="color: crimson;">can be placed in that column. That way, I can be sure that each number</strong>
+        <strong style="color: crimson;">is places only once per row, once per column and once per 3x3 square.</strong>
+        <strong style="color: crimson;">So essentially, it places each number 9 times before moving on to the next number.</strong>
+        <strong style="color: crimson;">Number 8 is in 'unsolved()', next function down.</strong>
+                    while avails[i][j][1] == "*":
+                        if control[0][0] in avails[i][j][2]:
+                            avails[i][j][1] = control[0][0]
+                            del control[0][0]
+                            if len(control[0]) == 0:
+                                del control[0]
+                        elif control[0][0] not in avails[i][j][2] and len(control[0]) != 1:
+                            control[0].append(control[0].pop(0))
+                        else:
+                            if control[0][0] in avails[i][j - 1][2]:
+                                control[0].append(avails[i][j - 1][1])
+                                avails[i][j - 1][1] = control[0][0]
+                                del control[0][0]
+                            elif control[0][0] in avails[i][j - 2][2]:
+                                control[0].append(avails[i][j - 2][1])
+                                avails[i][j - 2][1] = control[0][0]
+                                del control[0][0]
+            return avails
+
+        def unsolved(grid):
+    <strong style="color: crimson;">8. Once the grid has been filled, It generates a new empty grid</strong>
+        <strong style="color: crimson;">and copies 25 random numbers into the new grid in the correct spaces</strong>
+        <strong style="color: crimson;">giving me the option to export a complete grid or one with only 25 shown numbers.</strong>
+        <strong style="color: crimson;">25 was a purely arbitrary number. It proves for an extremely easy Sudoku</strong>
+        <strong style="color: crimson;">but as this is purely an example, that's fine.</strong>
+            new_grid = [[0 for i in range(9)] for j in range(9)]
+            plots = []
+            while len(plots) < 25:
+                for i in range(25):
+                    x = rnd.randint(0, 8)
+                    y = rnd.randint(0, 8)
+                    if [x, y] in plots:
+                        pass
+                    else:
+                        plots.append([x, y])
+            for i in plots:
+                new_grid[i[0]][i[1]] = grid[i[0]][i[1]] 
+
+            return new_grid
+
+    <strong style="color: crimson;">1. I start by creating an empty 9x9 grid.</strong>
+        grid = [[0 for i in range(9)] for j in range(9)]
+    <strong style="color: crimson;">2. I then run the entire code for each number.</strong>
+        <strong style="color: crimson;">I use control here to divide the list of 9 into 3s.</strong>
+        for num in range(1, 10):
+            control = [[0, 1, 2], [3, 4, 5], [6, 7, 8]]
+            rnd.shuffle(control)
+    <strong style="color: crimson;">3. For each number, I generate a grid of all free spaces.</strong>
+            avails = find_avails(grid)
+    <strong style="color: crimson;">4. If the number is 1, all spaces are free so this just starts things off.</strong>
+        <strong style="color: crimson;">Number 5 is under 'get_plots()'</strong>
+            if num == 1:
+                avails = round_one(control, avails)
+            else:
+                avails = get_plots(control, avails, num)
+
+            for i in avails:
+                for j in i:
+                    grid[j[0]][j[1]] = num
+        unsolv = unsolved(grid)
+
+        return unsolv
+        </code></pre>
+    </div>
+</div>
+</div>
+<script>
+    unsolved = {{grid}}
+    solved = {{solved}}
+</script>
+
+<script src="{% static 'js/sudoku.js' %}"></script>
+
+{% endblock %}
