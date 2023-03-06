@@ -24,14 +24,21 @@ function buildGrid() {
 }
 
 function numFilter() {
+    const plots = document.getElementsByClassName("sub_plot")
     let entered = this.value
+    const x = this.id[0]
+    const y = this.id[1]
     const nums = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
-    if (nums.includes(entered)) {
-        pass
+    if (nums.includes(entered) && entered != solved[x][y]) {
+        this.style.backgroundColor = "Red"
+    } else if (nums.includes(entered) && entered == solved[x][y]){
+        this.style.backgroundColor = "White"
     } else {
         this.value = ""
+        this.style.backgroundColor = "White"
     }
 }
+
 
 const btn = document.getElementById("solve");
 btn.addEventListener('click', function onClick() {
@@ -39,10 +46,10 @@ btn.addEventListener('click', function onClick() {
         for (let y = 0; y < 9; y++) {
             const plotId = x.toString() + y.toString()
             let plot = document.getElementById(plotId)
-            plot.setAttribute('value', solved[x][y])
+            plot.value = ""
+            plot.value = solved[x][y]
+            plot.style.backgroundColor = "White"
         }
     }
 })
-
-
 

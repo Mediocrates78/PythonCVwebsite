@@ -54,6 +54,10 @@ a {
     grid-column: 4;
 }
 
+.nav_contact {
+    grid-column: 5;
+}
+
 .home_table_wrapper {
     display: grid;
     grid-template-columns: 400px 400px;
@@ -120,7 +124,31 @@ a {
 .home_table_langr {
     grid-column: 2;
     grid-row: 3;
-    justify-self: start;
+    text-align: left;
+}
+
+.home_table_clangl {
+    grid-column: 1;
+    grid-row: 4;
+    justify-self: end;
+}
+
+.home_table_clangr {
+    grid-column: 2;
+    grid-row: 4;
+    text-align: left;
+}
+
+.home_table_emaill {
+    grid-column: 1;
+    grid-row: 5;
+    justify-self: end;
+}
+
+.home_table_emailr {
+    grid-column: 2;
+    grid-row: 5;
+    text-align: left;
 }
 
 .home_table_color {

@@ -2,6 +2,9 @@ from django.shortcuts import render
 from datetime import date
 import random as rnd
 from main.functions import *
+from .forms import ContactForm
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
 
 def home(request):
     current = date.today()
@@ -68,5 +71,5 @@ def sudoku(request):
         'grid': grid,
         'solved': solved
         }
-    print(request.POST)
     return render(request, 'main/sudoku.html', context)
+

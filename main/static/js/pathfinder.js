@@ -31,16 +31,18 @@ function clicked() {
     let plotColor = this.style.backgroundColor
     let plotIdNumber = this.id
     const clickedPlot = this
-
-    if (startEnd == 0) {
+    startEnd ++
+    if (startEnd == 1) {
         clickedPlot.style.backgroundColor = "red"
         coords.push(clickedPlot.id)
-        startEnd ++
-    } else {
+        
+    } else if (startEnd == 2) {
         clickedPlot.style.backgroundColor = "blue"
         coords.push(clickedPlot.id)
         const steps = getSteps()
         markSteps(steps)
+    } else {
+        pass
     }
 }
 
